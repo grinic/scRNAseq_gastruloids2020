@@ -21,19 +21,12 @@ suppressPackageStartupMessages(library(umap))
 
 rm(list = ls())
 gc()
-data_location <- "server"
-data_location <- "local"
-data_location <- "ext_drive"
-
-if(data_location == "server"){
+if(Sys.info()['nodename']=='PCBA-TRIVEDI02'){
   folder.RData <- "Y:\\Nicola_Gritti\\analysis_code\\scRNAseq_Gastruloids\\new_codes\\data\\"
-  outFolder <- "Y:\\Nicola_Gritti\\analysis_code\\scRNAseq_Gastruloids\\new_codes\\results\\integration\\pijuan_anlas\\"
-} else if(data_location == "local"){
-  folder.RData <- "C:\\Users\\nicol\\OneDrive\\Desktop\\scrnaseq_gastruloids\\data\\"
-  outFolder <- "C:\\Users\\nicol\\OneDrive\\Desktop\\scrnaseq_gastruloids\\results\\integration\\pijuan_anlas\\"
-} else if(data_location == "ext_drive"){
-  folder.RData <- "F:\\scrnaseq_gastruloids\\data\\"
-  outFolder <- "F:\\scrnaseq_gastruloids\\results\\integration\\pijuan_anlas\\"
+  outFolder <- "Y:\\Nicola_Gritti\\analysis_code\\scRNAseq_Gastruloids\\new_codes\\results\\integration\\pijuan_anlas_noExE\\"
+} else if(Sys.info()['nodename']=='PCBA-TRIVEDI03'){
+  folder.RData <- "C:\\Users\\nicol\\OneDrive\\Desktop\\scRNAseq_Gastruloids\\data\\"
+  outFolder <- "C:\\Users\\nicol\\OneDrive\\Desktop\\scRNAseq_Gastruloids\\results\\integration\\pijuan_anlas_noExE\\"
 }
 
 load(paste0(outFolder,"corrected_data.RData"))
@@ -115,7 +108,7 @@ p1 <- ggplot(correct_df_pijuan, aes(x=V1, y=V2, col=c(meta_pijuan$celltype.pijua
   ) +
   theme(axis.line = element_line(color = 'black')) + 
   theme(legend.title=element_blank()) +
-#  xlim(-16,16) + ylim(-16,16) +
+  #  xlim(-16,16) + ylim(-16,16) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
   labs(y= "UMAP 2", x = "UMAP 1") + 
   lineage_pijuan_colour_Publication()
@@ -131,7 +124,7 @@ p2 <- ggplot(correct_df_anlas, aes(x=V1, y=V2, col=c(meta_anlas$celltype.anlas))
   ) +
   theme(axis.line = element_line(color = 'black')) + 
   theme(legend.title=element_blank()) +
-#  xlim(-16,16) + ylim(-16,16) +
+  #  xlim(-16,16) + ylim(-16,16) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
   labs(y= "UMAP 2", x = "UMAP 1") + 
   lineage_anlas_colour_Publication()
@@ -149,7 +142,7 @@ p3 <- ggplot(correct_df, aes(x=V1, y=V2, col=c(meta_pijuan$stage, meta_anlas$mer
   ) +
   theme(axis.line = element_line(color = 'black')) + 
   theme(legend.title=element_blank()) +
-#  xlim(-16,16) + ylim(-16,16) +
+  #  xlim(-16,16) + ylim(-16,16) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
   labs(y= "UMAP 2", x = "UMAP 1") + 
   stage_color_Publication()
@@ -165,7 +158,7 @@ p4 <- ggplot(correct_df, aes(x=V1, y=V2, col=c(meta_pijuan$celltype.general, met
   ) +
   theme(axis.line = element_line(color = 'black')) + 
   theme(legend.title=element_blank()) +
-#  xlim(-16,16) + ylim(-16,16) +
+  #  xlim(-16,16) + ylim(-16,16) +
   guides(colour = guide_legend(override.aes = list(size=5))) + 
   labs(y= "UMAP 2", x = "UMAP 1") + 
   lineage_color_Publication()
@@ -183,9 +176,9 @@ p5 <- ggplot(correct_df, aes(x=V1, y=V2, col=c(meta_pijuan$celltype.general, met
   ) +
   theme(axis.line = element_line(color = 'black')) + 
   theme(legend.title=element_blank()) +
-#  xlim(-16,16) + ylim(-16,16) +
+  #  xlim(-16,16) + ylim(-16,16) +
   guides(colour = guide_legend(override.aes = list(size=5))) + 
-#  labs(y= "UMAP 2", x = "UMAP 1") + 
+  #  labs(y= "UMAP 2", x = "UMAP 1") + 
   lineage_pijuan_colour_Publication()
 
 p5
@@ -197,10 +190,10 @@ ggsave(
   plot = p1,
   device = NULL,
   path = NULL,
-#  scale = 1,
+  #  scale = 1,
   width = 10,
   height = 5,
-#  units = c("in", "cm", "mm"),
+  #  units = c("in", "cm", "mm"),
   dpi = 300,
   limitsize = FALSE,
 )

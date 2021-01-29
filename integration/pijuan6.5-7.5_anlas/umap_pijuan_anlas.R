@@ -19,13 +19,19 @@ suppressPackageStartupMessages(library(umap))
 
 ######################################################################################################################
 
-# load dataset
-if(Sys.info()['nodename']=='PCBA-TRIVEDI02'){
+data_location <- "server"
+data_location <- "local"
+data_location <- "ext_drive"
+
+if(data_location == "server"){
   folder.RData <- "Y:\\Nicola_Gritti\\analysis_code\\scRNAseq_Gastruloids\\new_codes\\data\\"
   outFolder <- "Y:\\Nicola_Gritti\\analysis_code\\scRNAseq_Gastruloids\\new_codes\\results\\integration\\pijuan6.5-7.5_anlas\\"
-} else if(Sys.info()['nodename']=='PCBA-TRIVEDI03'){
-  folder.RData <- "C:\\Users\\nicol\\OneDrive\\Desktop\\scRNAseq_Gastruloids\\data\\"
-  outFolder <- "C:\\Users\\nicol\\OneDrive\\Desktop\\scRNAseq_Gastruloids\\results\\integration\\pijuan6.5-7.5_anlas\\"
+} else if(data_location == "local"){
+  folder.RData <- "C:\\Users\\nicol\\OneDrive\\Desktop\\scrnaseq_gastruloids\\data\\"
+  outFolder <- "C:\\Users\\nicol\\OneDrive\\Desktop\\scrnaseq_gastruloids\\results\\integration\\pijuan6.5-7.5_anlas\\"
+} else if(data_location == "ext_drive"){
+  folder.RData <- "F:\\scrnaseq_gastruloids\\data\\"
+  outFolder <- "F:\\scrnaseq_gastruloids\\results\\integration\\pijuan6.5-7.5_anlas\\"
 }
 load(paste0(outFolder,"corrected_data.RData"))
 

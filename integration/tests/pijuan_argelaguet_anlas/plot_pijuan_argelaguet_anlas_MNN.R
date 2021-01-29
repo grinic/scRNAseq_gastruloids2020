@@ -21,26 +21,17 @@ suppressPackageStartupMessages(library(umap))
 
 rm(list = ls())
 gc()
-data_location <- "server"
-data_location <- "local"
-data_location <- "ext_drive"
-
-if(data_location == "server"){
-  folder.RData <- "Y:\\Nicola_Gritti\\analysis_code\\scRNAseq_Gastruloids\\new_codes\\data\\"
-  outFolder <- "Y:\\Nicola_Gritti\\analysis_code\\scRNAseq_Gastruloids\\new_codes\\results\\integration\\pijuan_anlas\\"
-} else if(data_location == "local"){
-  folder.RData <- "C:\\Users\\nicol\\OneDrive\\Desktop\\scrnaseq_gastruloids\\data\\"
-  outFolder <- "C:\\Users\\nicol\\OneDrive\\Desktop\\scrnaseq_gastruloids\\results\\integration\\pijuan_anlas\\"
-} else if(data_location == "ext_drive"){
-  folder.RData <- "F:\\scrnaseq_gastruloids\\data\\"
-  outFolder <- "F:\\scrnaseq_gastruloids\\results\\integration\\pijuan_anlas\\"
+if(Sys.info()['nodename']=='PCBA-TRIVEDI02'){
+  folder <- "Y:\\Nicola_Gritti\\analysis_code\\scRNAseq_Gastruloids\\R_codes\\integration_MNN\\pijuan_argelaguet_anlas\\"
+} else if(Sys.info()['nodename']=='PCBA-TRIVEDI03'){
+  folder <- "C:\\Users\\nicol\\OneDrive\\Desktop\\integration_MNN\\pijuan_argelaguet_anlas\\"
 }
 
-load(paste0(outFolder,"corrected_data.RData"))
-load(paste0(outFolder,"corrected_data_umap.RData"))
+load(paste0(folder,"corrected_data.RData"))
 
 correct_df <- as.data.frame(correct.umap$layout)
 correct_df_pijuan <- correct_df[pijuan_rows,]
+correct_df_argelaguet <- correct_df[argelaguet_rows,]
 correct_df_anlas <- correct_df[anlas_rows,]
 
 # define colors
@@ -49,8 +40,8 @@ stage_color_Publication <- function(...){
   library(scales)
   discrete_scale("colour", "Publication",
                  manual_pal(values = c(
-                   "#000000", "#404040", "#707070",
-                   "#330000", "#660000", "#990000", "#cc0000", "#ff0000", "#ff3232", "#ff4c4c", "#ff7f7f", "#ffb2b2", "#ffcccc")))
+                   "#000000", "#181818", "#404040", "#707070",
+                   "#990000", "#b20000", "#e50000", "#ff3232", "#ff6666", "#ff7f7f", "#ffb2b2")))
 }
 
 lineage_anlas_colour_Publication <- function(...){
@@ -95,14 +86,12 @@ lineage_color_Publication <- function(...){
   library(scales)
   discrete_scale("colour", "Publication",
                  manual_pal(values = c(
-                   "#000000", "#404040", "#707070", 
+                   "#000000", "#181818", "#404040", "#707070", 
                    "#008941", "#006FA6", "#A30059", "#7A4900", 
                    "#0000A6", "#63FFAC", "#B79762", "#004D43", "#8FB0FF")))
 }
 
 library(cowplot)
-
-############################################################################################################
 
 p1 <- ggplot(correct_df_pijuan, aes(x=V1, y=V2, col=c(meta_pijuan$celltype.pijuan))) + 
   geom_point(size=0.01) + 
@@ -115,12 +104,12 @@ p1 <- ggplot(correct_df_pijuan, aes(x=V1, y=V2, col=c(meta_pijuan$celltype.pijua
   ) +
   theme(axis.line = element_line(color = 'black')) + 
   theme(legend.title=element_blank()) +
-#  xlim(-16,16) + ylim(-16,16) +
+  xlim(-16,16) + ylim(-16,16) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
   labs(y= "UMAP 2", x = "UMAP 1") + 
   lineage_pijuan_colour_Publication()
 
-p2 <- ggplot(correct_df_anlas, aes(x=V1, y=V2, col=c(meta_anlas$celltype.anlas))) + 
+p2 <- ggplot(correct_df_argelaguet, aes(x=V1, y=V2, col=c(meta_argelaguet$celltype.argelaguet))) + 
   geom_point(size=0.01) + 
   theme_bw() +
   theme(
@@ -131,14 +120,30 @@ p2 <- ggplot(correct_df_anlas, aes(x=V1, y=V2, col=c(meta_anlas$celltype.anlas))
   ) +
   theme(axis.line = element_line(color = 'black')) + 
   theme(legend.title=element_blank()) +
-#  xlim(-16,16) + ylim(-16,16) +
+  xlim(-16,16) + ylim(-16,16) +
+  guides(colour = guide_legend(override.aes = list(size=5))) +
+  labs(y= "UMAP 2", x = "UMAP 1") + 
+  lineage_pijuan_colour_Publication()
+
+p3 <- ggplot(correct_df_anlas, aes(x=V1, y=V2, col=c(meta_anlas$celltype.anlas))) + 
+  geom_point(size=0.01) + 
+  theme_bw() +
+  theme(
+    plot.background = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank()
+  ) +
+  theme(axis.line = element_line(color = 'black')) + 
+  theme(legend.title=element_blank()) +
+  xlim(-16,16) + ylim(-16,16) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
   labs(y= "UMAP 2", x = "UMAP 1") + 
   lineage_anlas_colour_Publication()
 
-p1+p2
+p1+p2+p3
 
-p3 <- ggplot(correct_df, aes(x=V1, y=V2, col=c(meta_pijuan$stage, meta_anlas$merge.ident))) + 
+p4 <- ggplot(correct_df, aes(x=V1, y=V2, col=c(meta_pijuan$stage, meta_argelaguet$stage, meta_anlas$merge.ident))) + 
   geom_point(size=0.01) + 
   theme_bw() +
   theme(
@@ -149,12 +154,12 @@ p3 <- ggplot(correct_df, aes(x=V1, y=V2, col=c(meta_pijuan$stage, meta_anlas$mer
   ) +
   theme(axis.line = element_line(color = 'black')) + 
   theme(legend.title=element_blank()) +
-#  xlim(-16,16) + ylim(-16,16) +
+  xlim(-16,16) + ylim(-16,16) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
   labs(y= "UMAP 2", x = "UMAP 1") + 
   stage_color_Publication()
 
-p4 <- ggplot(correct_df, aes(x=V1, y=V2, col=c(meta_pijuan$celltype.general, meta_anlas$merge.ident))) + 
+p5 <- ggplot(correct_df, aes(x=V1, y=V2, col=c(meta_pijuan$celltype.general, meta_argelaguet$celltype.general, meta_anlas$merge.ident))) + 
   geom_point(size=0.01) + 
   theme_bw() +
   theme(
@@ -165,14 +170,14 @@ p4 <- ggplot(correct_df, aes(x=V1, y=V2, col=c(meta_pijuan$celltype.general, met
   ) +
   theme(axis.line = element_line(color = 'black')) + 
   theme(legend.title=element_blank()) +
-#  xlim(-16,16) + ylim(-16,16) +
+  xlim(-16,16) + ylim(-16,16) +
   guides(colour = guide_legend(override.aes = list(size=5))) + 
   labs(y= "UMAP 2", x = "UMAP 1") + 
   lineage_color_Publication()
 
-p3 + p4
+p4 + p5
 
-p5 <- ggplot(correct_df, aes(x=V1, y=V2, col=c(meta_pijuan$celltype.general, meta_anlas$celltype.general))) + 
+p6 <- ggplot(correct_df, aes(x=V1, y=V2, col=c(meta_pijuan$celltype.general, meta_argelaguet$celltype.general, meta_anlas$celltype.general))) + 
   geom_point(size=0.01) + 
   theme_bw() +
   theme(
@@ -183,30 +188,30 @@ p5 <- ggplot(correct_df, aes(x=V1, y=V2, col=c(meta_pijuan$celltype.general, met
   ) +
   theme(axis.line = element_line(color = 'black')) + 
   theme(legend.title=element_blank()) +
-#  xlim(-16,16) + ylim(-16,16) +
+  xlim(-16,16) + ylim(-16,16) +
   guides(colour = guide_legend(override.aes = list(size=5))) + 
-#  labs(y= "UMAP 2", x = "UMAP 1") + 
+  labs(y= "UMAP 2", x = "UMAP 1") + 
   lineage_pijuan_colour_Publication()
 
-p5
+p6
 
 #########################################################################################################
 
 ggsave(
-  paste0(outFolder, "p1_pijuanCelltype.pdf"),
+  paste0(folder, "p1_pijuanCelltype.pdf"),
   plot = p1,
   device = NULL,
   path = NULL,
-#  scale = 1,
+  #  scale = 1,
   width = 10,
   height = 5,
-#  units = c("in", "cm", "mm"),
+  #  units = c("in", "cm", "mm"),
   dpi = 300,
   limitsize = FALSE,
 )
 
 ggsave(
-  paste0(outFolder, "p2_anlasCelltype.pdf"),
+  paste0(folder, "p2_argelaguetCelltype.pdf"),
   plot = p2,
   device = NULL,
   path = NULL,
@@ -219,12 +224,12 @@ ggsave(
 )
 
 ggsave(
-  paste0(outFolder, "p3_pijuanStage_anlasStage.pdf"),
+  paste0(folder, "p3_anlasCelltype.pdf"),
   plot = p3,
   device = NULL,
   path = NULL,
   #  scale = 1,
-  width = 6,
+  width = 10,
   height = 5,
   #  units = c("in", "cm", "mm"),
   dpi = 300,
@@ -232,7 +237,7 @@ ggsave(
 )
 
 ggsave(
-  paste0(outFolder, "p4_pijuanCelltype_anlasStage.pdf"),
+  paste0(folder, "p4_pijuanArgelaguetStage_anlasStage.pdf"),
   plot = p4,
   device = NULL,
   path = NULL,
@@ -245,8 +250,21 @@ ggsave(
 )
 
 ggsave(
-  paste0(outFolder, "p5_pijuanCelltype_anlasCelltype.pdf"),
+  paste0(folder, "p5_pijuanArgelaguetCelltype_anlasStage.pdf"),
   plot = p5,
+  device = NULL,
+  path = NULL,
+  #  scale = 1,
+  width = 6,
+  height = 5,
+  #  units = c("in", "cm", "mm"),
+  dpi = 300,
+  limitsize = FALSE,
+)
+
+ggsave(
+  paste0(folder, "p6_pijuanArgelaguetCelltype_anlasCelltype.pdf"),
+  plot = p6,
   device = NULL,
   path = NULL,
   #  scale = 1,

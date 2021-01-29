@@ -85,26 +85,20 @@ doBatchCorrect <- function(counts, timepoints, samples, timepoint_order, sample_
 
 #######################################################################################################################
 
-data_location <- "server"
-data_location <- "local"
-data_location <- "ext_drive"
-
-if(data_location == "server"){
+# load dataset
+if(Sys.info()['nodename']=='PCBA-TRIVEDI02'){
   folder.RData <- "Y:\\Nicola_Gritti\\analysis_code\\scRNAseq_Gastruloids\\new_codes\\data\\"
-  outFolder <- "Y:\\Nicola_Gritti\\analysis_code\\scRNAseq_Gastruloids\\new_codes\\results\\integration\\pijuan6.5-7.5_anlas\\"
-} else if(data_location == "local"){
-  folder.RData <- "C:\\Users\\nicol\\OneDrive\\Desktop\\scrnaseq_gastruloids\\data\\"
-  outFolder <- "C:\\Users\\nicol\\OneDrive\\Desktop\\scrnaseq_gastruloids\\results\\integration\\pijuan6.5-7.5_anlas\\"
-} else if(data_location == "ext_drive"){
-  folder.RData <- "F:\\scrnaseq_gastruloids\\data\\"
-  outFolder <- "F:\\scrnaseq_gastruloids\\results\\integration\\pijuan6.5-7.5_anlas\\"
+  outFolder <- "Y:\\Nicola_Gritti\\analysis_code\\scRNAseq_Gastruloids\\new_codes\\results\\integration\\pijuan_anlas_noExE\\"
+} else if(Sys.info()['nodename']=='PCBA-TRIVEDI03'){
+  folder.RData <- "C:\\Users\\nicol\\OneDrive\\Desktop\\scRNAseq_Gastruloids\\data\\"
+  outFolder <- "C:\\Users\\nicol\\OneDrive\\Desktop\\scRNAseq_Gastruloids\\results\\integration\\pijuan_anlas_noExE\\"
 }
 load(paste0(folder.RData,"anlas_data.RData"))
 load(paste0(folder.RData,"pijuan_data.RData"))
 
 # filter pijuan data to only stages needed
-pijuan <- NormalizeData(object = pijuan, normalization.method = "LogNormalize", scale.factor = 10000)
-pijuan <- pijuan[,(pijuan$stage=='E6.5')|(pijuan$stage=='E6.75')|(pijuan$stage=='E7.0')|(pijuan$stage=='E7.25')|(pijuan$stage=='E7.5')]
+pijuan <- pijuan[,grep('ExE', pijuan$celltype.pijuan, invert=T)]
+pijuan <- pijuan[,grep('Visceral endoderm', pijuan$celltype.pijuan, invert=T)]
 pijuan <- pijuan[rowSums(pijuan)>10,]
 pijuan <- pijuan[grep('mt-',rownames(pijuan),invert=T),]
 
@@ -323,8 +317,9 @@ message("Done\n")
 write.table(correct, file= paste0(outFolder,"integration.csv"), sep=",")
 write.table(meta_pijuan, file= paste0(outFolder,"meta_pijuan.csv"), sep=",")
 write.table(meta_anlas, file= paste0(outFolder,"meta_anlas.csv"), sep=",")
-save(correct, meta_pijuan, meta_anlas, pijuan_rows, anlas_rows, file= paste0(folder,"corrected_data.RData"))
+save(correct, meta_pijuan, meta_anlas, pijuan_rows, anlas_rows, file= paste0(outFolder,"corrected_data.RData"))
 
 rm(list = ls())
 gc()
+
 
