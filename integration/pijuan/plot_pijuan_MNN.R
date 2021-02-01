@@ -24,7 +24,11 @@ gc()
 
 data_location <- "server"
 data_location <- "local"
+<<<<<<< HEAD
+# data_location <- "ext_drive"
+=======
 data_location <- "ext_drive"
+>>>>>>> 10e802b84a6edb1abe3130a1f916d6ccc8668b6f
 
 if(data_location == "server"){
   folder.RData <- "Y:\\Nicola_Gritti\\analysis_code\\scRNAseq_Gastruloids\\new_codes\\data\\"

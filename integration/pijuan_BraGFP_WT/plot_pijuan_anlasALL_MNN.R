@@ -23,7 +23,11 @@ rm(list = ls())
 gc()
 data_location <- "server"
 data_location <- "local"
+<<<<<<< HEAD
+# data_location <- "ext_drive"
+=======
 data_location <- "ext_drive"
+>>>>>>> 10e802b84a6edb1abe3130a1f916d6ccc8668b6f
 
 if(data_location == "server"){
   folder.RData <- "Y:\\Nicola_Gritti\\analysis_code\\scRNAseq_Gastruloids\\new_codes\\data\\"
@@ -137,7 +141,7 @@ p2 <- ggplot(correct_df_anlas, aes(x=V1, y=V2, col=c(meta_anlas$merge.ident))) +
   labs(y= "UMAP 2", x = "UMAP 1") + 
   lineage_anlas_colour_Publication()
 
-p1+p2
+# p1+p2
 
 p3 <- ggplot(correct_df, aes(x=V1, y=V2, col=c(meta_pijuan$stage, meta_anlas$merge.ident))) + 
   geom_point(size=0.01) + 
@@ -171,7 +175,7 @@ p4 <- ggplot(correct_df, aes(x=V1, y=V2, col=c(meta_pijuan$celltype.general, met
   labs(y= "UMAP 2", x = "UMAP 1") + 
   lineage_color_Publication()
 
-p3 + p4
+# p3 + p4
 
 p5 <- ggplot(correct_df, aes(x=V1, y=V2, col=c(meta_pijuan$celltype.general, meta_anlas$celltype.general))) + 
   geom_point(size=0.01) + 
@@ -189,7 +193,7 @@ p5 <- ggplot(correct_df, aes(x=V1, y=V2, col=c(meta_pijuan$celltype.general, met
 #  labs(y= "UMAP 2", x = "UMAP 1") + 
   lineage_pijuan_colour_Publication()
 
-p5
+# p5
 
 #########################################################################################################
 

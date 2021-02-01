@@ -19,6 +19,19 @@ suppressPackageStartupMessages(library(umap))
 
 data_location <- "server"
 data_location <- "local"
+<<<<<<< HEAD
+# data_location <- "ext_drive"
+
+if(data_location == "server"){
+  folder.RData <- "Y:\\Nicola_Gritti\\analysis_code\\scRNAseq_Gastruloids\\new_codes\\data\\"
+  outFolder <- "Y:\\Nicola_Gritti\\analysis_code\\scRNAseq_Gastruloids\\new_codes\\results\\integration\\diff_expr\\"
+} else if(data_location == "local"){
+  folder.RData <- "C:\\Users\\nicol\\OneDrive\\Desktop\\scrnaseq_gastruloids\\data\\"
+  outFolder <- "C:\\Users\\nicol\\OneDrive\\Desktop\\scrnaseq_gastruloids\\results\\integration\\diff_expr\\"
+} else if(data_location == "ext_drive"){
+  folder.RData <- "F:\\scrnaseq_gastruloids\\data\\"
+  outFolder <- "F:\\scrnaseq_gastruloids\\results\\integration\\diff_expr\\"
+=======
 
 if(data_location == "server"){
   folder.RData <- "Y:\\Nicola_Gritti\\analysis_code\\scRNAseq_Gastruloids\\new_codes\\data\\"
@@ -26,6 +39,7 @@ if(data_location == "server"){
 } else if(data_location == "local"){
   folder.RData <- "F:\\scrnaseq_gastruloids\\data\\"
   outFolder <- "F:\\scrnaseq_gastruloids\\data\\integration\\diff_exp\\"
+>>>>>>> 10e802b84a6edb1abe3130a1f916d6ccc8668b6f
 }
 load(paste0(folder.RData,"anlas_data.RData"))
 load(paste0(folder.RData,"pijuan_data.RData"))
@@ -176,9 +190,25 @@ gc()
 
 ###
 levels(seurat_all)
+<<<<<<< HEAD
+markers <- FindMarkers(seurat_all, ident.1 = "Epiblast", ident.2 = "G Pluripotent",
+                       test.use = "LR", latent.vars = "batch.ident", min.pct = 0.5)
+head(markers)
+
+# features <- c("T","Nanog","Sox2")
+# VlnPlot(seurat_all, features = features)
+
+seurat_pluripotent <- seurat_all[,(seurat_all$celltype.general=='Epiblast')|(seurat_all$celltype.general=='G Pluripotent')]
+# VlnPlot(seurat_pluripotent[,seurat_pluripotent$celltype.general=='Epiblast'], features = epiblast_high, combine=TRUE)
+
+write.csv(seurat_pluripotent[labels(markers)[[1]]][['RNA']]@data,paste0(outFolder,"expression_markers.csv"))
+write.csv(seurat_pluripotent$celltype.general,paste0(outFolder,"cell_id.csv"))
+write.csv(markers,paste0(outFolder,"markers.csv"))
+=======
 markers <- FindMarkers(seurat_all, ident.1 = "Epiblast", ident.2 = "G Pluripotent", min.pct = 0.5)
 head(markers)
 
 features <- c("T","Nanog","Sox2")
 VlnPlot(pijuan, features = features)
+>>>>>>> 10e802b84a6edb1abe3130a1f916d6ccc8668b6f
 
