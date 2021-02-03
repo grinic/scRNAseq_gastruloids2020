@@ -86,8 +86,8 @@ doBatchCorrect <- function(counts, timepoints, samples, timepoint_order, sample_
 #######################################################################################################################
 
 data_location <- "server"
-data_location <- "local"
-data_location <- "ext_drive"
+# data_location <- "local"
+# data_location <- "ext_drive"
 
 if(data_location == "server"){
   folder.RData <- "Y:\\Nicola_Gritti\\analysis_code\\scRNAseq_Gastruloids\\new_codes\\data\\"
@@ -199,9 +199,9 @@ for(i in 1:length(meta_pijuan$celltype.pijuan)){
   } else if(old=="Def. endoderm"){
     c[i] <- 'Endoderm'
   } else if(old=="Parietal endoderm"){
-    c[i] <- 'Endoderm'
+    c[i] <- 'ExE'
   } else if(old=="Allantois"){
-    c[i] <- 'Endoderm'
+    c[i] <- 'ExE'
   } else if(old=="Anterior Primitive Streak"){
     c[i] <- 'Primitive Streak'
   } else if(old=="Endothelium"){

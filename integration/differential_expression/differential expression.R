@@ -5,6 +5,7 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 # BiocManager::install("Seurat")
 # BiocManager::install("scater")
 # BiocManager::install("umap")
+# install.packages("tidyverse")
 
 suppressPackageStartupMessages(library(Seurat))
 suppressPackageStartupMessages(library(scran))
@@ -18,8 +19,7 @@ suppressPackageStartupMessages(library(irlba))
 suppressPackageStartupMessages(library(umap))
 
 data_location <- "server"
-data_location <- "local"
-<<<<<<< HEAD
+# data_location <- "local"
 # data_location <- "ext_drive"
 
 if(data_location == "server"){
@@ -31,15 +31,6 @@ if(data_location == "server"){
 } else if(data_location == "ext_drive"){
   folder.RData <- "F:\\scrnaseq_gastruloids\\data\\"
   outFolder <- "F:\\scrnaseq_gastruloids\\results\\integration\\diff_expr\\"
-=======
-
-if(data_location == "server"){
-  folder.RData <- "Y:\\Nicola_Gritti\\analysis_code\\scRNAseq_Gastruloids\\new_codes\\data\\"
-  outFolder <- "Y:\\Nicola_Gritti\\analysis_code\\scRNAseq_Gastruloids\\new_codes\\results\\integration\\diff_exp\\"
-} else if(data_location == "local"){
-  folder.RData <- "F:\\scrnaseq_gastruloids\\data\\"
-  outFolder <- "F:\\scrnaseq_gastruloids\\data\\integration\\diff_exp\\"
->>>>>>> 10e802b84a6edb1abe3130a1f916d6ccc8668b6f
 }
 load(paste0(folder.RData,"anlas_data.RData"))
 load(paste0(folder.RData,"pijuan_data.RData"))
@@ -67,8 +58,11 @@ anlas <- anlas[common_features,]
 # remove integrated assay from anlas
 anlas[['integrated']] <- NULL
 
-# reassign celltype names for pijuan dataset
+# extract metadata
 meta_pijuan <- pijuan@meta.data
+meta_anlas <- anlas@meta.data
+
+# reassign celltype names for pijuan dataset
 c <- c()
 for(i in 1:length(meta_pijuan$celltype.pijuan)){
   old <- meta_pijuan$celltype.pijuan[i]
@@ -125,9 +119,9 @@ for(i in 1:length(meta_pijuan$celltype.pijuan)){
   } else if(old=="Def. endoderm"){
     c[i] <- 'Endoderm'
   } else if(old=="Parietal endoderm"){
-    c[i] <- 'Endoderm'
+    c[i] <- 'ExE'
   } else if(old=="Allantois"){
-    c[i] <- 'Endoderm'
+    c[i] <- 'ExE'
   } else if(old=="Anterior Primitive Streak"){
     c[i] <- 'Primitive Streak'
   } else if(old=="Endothelium"){
@@ -158,14 +152,16 @@ meta_anlas <- anlas@meta.data
 c <- c()
 for(i in 1:length(meta_anlas$celltype.anlas)){
   old <- meta_anlas$celltype.anlas[i]
-  if(grepl("Early ", old)){
+  if(grepl("Early diff", old)){
     c[i] <- 'G Early diff'
+  } else if(grepl("Early vasc", old)){
+    c[i] <- 'G Mesodermal'
   } else if(grepl("Primed ", old)){
     c[i] <- 'G Primed pluripotent'
   } else if(grepl("Pluripotent ", old)){
     c[i] <- 'G Pluripotent'
   } else if(grepl("Mesodermal", old)){
-    c[i] <- 'G Mesoderm'
+    c[i] <- 'G Mesodermal'
   } else if(grepl("Neural ", old)){
     c[i] <- 'G Neural'
   } else if(grepl("neural&", old)){
@@ -182,6 +178,8 @@ levels(anlas)
 # merge seurat objects
 pijuan@project.name <- "pijuan"
 anlas@project.name <- "anlas"
+pijuan$dataset <- "pijuan"
+anlas$dataset <- "anlas"
 seurat_all <- merge( x = pijuan, y = anlas )
 
 # clean up memory
@@ -190,25 +188,115 @@ gc()
 
 ###
 levels(seurat_all)
-<<<<<<< HEAD
-markers <- FindMarkers(seurat_all, ident.1 = "Epiblast", ident.2 = "G Pluripotent",
-                       test.use = "LR", latent.vars = "batch.ident", min.pct = 0.5)
-head(markers)
 
 # features <- c("T","Nanog","Sox2")
 # VlnPlot(seurat_all, features = features)
 
-seurat_pluripotent <- seurat_all[,(seurat_all$celltype.general=='Epiblast')|(seurat_all$celltype.general=='G Pluripotent')]
-# VlnPlot(seurat_pluripotent[,seurat_pluripotent$celltype.general=='Epiblast'], features = epiblast_high, combine=TRUE)
+# filter only the cell types you want to run the diff_exp analysis on
+seurat_pluripotent <- seurat_all[,(seurat_all$celltype.general=='Epiblast')|(seurat_all$celltype.general=='G Pluripotent')|(seurat_all$celltype.general=='G Primed pluripotent')|(seurat_all$celltype.general=='G Early diff')]
+levels(seurat_pluripotent)
 
-write.csv(seurat_pluripotent[labels(markers)[[1]]][['RNA']]@data,paste0(outFolder,"expression_markers.csv"))
-write.csv(seurat_pluripotent$celltype.general,paste0(outFolder,"cell_id.csv"))
-write.csv(markers,paste0(outFolder,"markers.csv"))
-=======
-markers <- FindMarkers(seurat_all, ident.1 = "Epiblast", ident.2 = "G Pluripotent", min.pct = 0.5)
-head(markers)
+############################################
+# markers.epi.pluri <- FindMarkers(seurat_all, ident.1 = "Epiblast", ident.2 = "G Pluripotent",
+#                                  test.use = "LR", latent.vars = "batch.ident", min.pct = 0.5)
+# head(markers.epi.pluri)
+# 
+# markers.epi.primed <- FindMarkers(seurat_all, ident.1 = "Epiblast", ident.2 = "G Primed pluripotent",
+#                                   test.use = "LR", latent.vars = "batch.ident", min.pct = 0.5)
+# head(markers.epi.primed)
+# 
+# write.csv(seurat_pluripotent[labels(markers.epi.pluri)[[1]],(seurat_all$celltype.general=='Epiblast')|(seurat_all$celltype.general=='G Pluripotent')][['RNA']]@data,paste0(outFolder,"expression_markers_epi_pluri.csv"))
+# # write.csv(seurat_pluripotent$celltype.general,paste0(outFolder,"cell_id.csv"))
+# write.csv(markers.epi.pluri,paste0(outFolder,"markers_epi_pluri.csv"))
+# 
+# write.csv(seurat_pluripotent[labels(markers.epi.primed)[[1]],(seurat_all$celltype.general=='Epiblast')|(seurat_all$celltype.general=='G Primed pluripotent')][['RNA']]@data,paste0(outFolder,"expression_markers_epi_primed.csv"))
+# # write.csv(seurat_pluripotent$celltype.general,paste0(outFolder,"cell_id.csv"))
+# write.csv(markers.epi.primed,paste0(outFolder,"markers_epi_primed.csv"))
+############################################
 
-features <- c("T","Nanog","Sox2")
-VlnPlot(pijuan, features = features)
->>>>>>> 10e802b84a6edb1abe3130a1f916d6ccc8668b6f
+### make diff exp analysis
+
+### epiblast vs pluripotent
+# genes.to.label = c("Rps2", "Dppa5a", "Tdh")
+c_pluri <- seurat_pluripotent[,(seurat_pluripotent$celltype.general=='Epiblast')|
+                               (seurat_pluripotent$celltype.general=='G Pluripotent')]
+Idents(c_pluri) <- "dataset"
+avg.cells.pluri <- log1p(AverageExpression(c_pluri, verbose = FALSE)$RNA)
+avg.cells.pluri$gene <- rownames(avg.cells.pluri)
+
+# compute avg_logFC as in FindMarkers of Seurat
+logfc <- c()
+for (i in 1: length(avg.cells.pluri$gene)){
+  a <- avg.cells.pluri$pijuan[i]
+  b <- avg.cells.pluri$anlas[i]
+  logfc[i] <- a-b
+}
+avg.cells.pluri$avg_logFC <- logfc
+
+# extract markers based on logfc
+markers_epi_pluri <- avg.cells.pluri[(avg.cells.pluri$avg_logFC>1.0)|(avg.cells.pluri$avg_logFC<(-1.0)),]
+
+p1 <- ggplot(avg.cells.pluri, aes(pijuan, anlas)) + geom_point() + ggtitle("Epiblast vs Pluripotent")
+p1 <- LabelPoints(plot = p1, points = markers_epi_pluri$gene, repel = TRUE)
+p1
+
+write.csv(c_pluri[labels(markers_epi_pluri)[[1]],][['RNA']]@data,paste0(outFolder,"expression_markers_epi_pluri.csv"))
+# write.csv(seurat_pluripotent$celltype.general,paste0(outFolder,"cell_id.csv"))
+write.csv(markers_epi_pluri,paste0(outFolder,"markers_epi_pluri.csv"))
+
+### epiblast vs primed pluripotent
+# genes.to.label = c("Rps2", "Dppa5a", "Tdh")
+c_primed <- seurat_pluripotent[,(seurat_pluripotent$celltype.general=='Epiblast')|
+                                (seurat_pluripotent$celltype.general=='G Primed pluripotent')]
+Idents(c_primed) <- "dataset"
+avg.cells.primed <- log1p(AverageExpression(c_primed, verbose = FALSE)$RNA)
+avg.cells.primed$gene <- rownames(avg.cells.primed)
+
+# compute avg_logFC as in FindMarkers of Seurat
+logfc <- c()
+for (i in 1: length(avg.cells.primed$gene)){
+  a <- avg.cells.primed$pijuan[i]
+  b <- avg.cells.primed$anlas[i]
+  logfc[i] <- a-b
+}
+avg.cells.primed$avg_logFC <- logfc
+
+# extract markers based on logfc
+markers_epi_primed <- avg.cells.primed[(avg.cells.primed$avg_logFC>1.0)|(avg.cells.primed$avg_logFC<(-1.0)),]
+
+p2 <- ggplot(avg.cells.primed, aes(pijuan, anlas)) + geom_point() + ggtitle("Epiblast vs Primed")
+p2 <- LabelPoints(plot = p2, points = markers_epi_primed$gene, repel = TRUE)
+p2
+
+write.csv(c_primed[labels(markers_epi_primed)[[1]],][['RNA']]@data,paste0(outFolder,"expression_markers_epi_primed.csv"))
+# write.csv(seurat_pluripotent$celltype.general,paste0(outFolder,"cell_id.csv"))
+write.csv(markers_epi_primed,paste0(outFolder,"markers_epi_primed.csv"))
+
+### epiblast vs early diff
+# genes.to.label = c("Rps2", "Dppa5a", "Tdh")
+c_ediff <- seurat_pluripotent[,(seurat_pluripotent$celltype.general=='Epiblast')|
+                                 (seurat_pluripotent$celltype.general=='G Early diff')]
+Idents(c_ediff) <- "dataset"
+avg.cells.ediff <- log1p(AverageExpression(c_ediff, verbose = FALSE)$RNA)
+avg.cells.ediff$gene <- rownames(avg.cells.ediff)
+
+# compute avg_logFC as in FindMarkers of Seurat
+logfc <- c()
+for (i in 1: length(avg.cells.ediff$gene)){
+  a <- avg.cells.ediff$pijuan[i]
+  b <- avg.cells.ediff$anlas[i]
+  logfc[i] <- a-b
+}
+avg.cells.ediff$avg_logFC <- logfc
+
+# extract markers based on logfc
+markers_epi_ediff <- avg.cells.ediff[(avg.cells.ediff$avg_logFC>1.0)|(avg.cells.ediff$avg_logFC<(-1.0)),]
+
+p3 <- ggplot(avg.cells.ediff, aes(pijuan, anlas)) + geom_point() + ggtitle("Epiblast vs Ediff")
+p3 <- LabelPoints(plot = p3, points = markers_epi_ediff$gene, repel = TRUE)
+p3
+
+write.csv(c_ediff[labels(markers_epi_primed)[[1]],][['RNA']]@data,paste0(outFolder,"expression_markers_epi_ediff.csv"))
+# write.csv(seurat_pluripotent$celltype.general,paste0(outFolder,"cell_id.csv"))
+write.csv(markers_epi_primed,paste0(outFolder,"markers_epi_ediff.csv"))
 

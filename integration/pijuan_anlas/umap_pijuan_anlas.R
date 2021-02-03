@@ -20,8 +20,8 @@ suppressPackageStartupMessages(library(umap))
 ######################################################################################################################
 
 data_location <- "server"
-data_location <- "local"
-data_location <- "ext_drive"
+# data_location <- "local"
+# data_location <- "ext_drive"
 
 if(data_location == "server"){
   folder.RData <- "Y:\\Nicola_Gritti\\analysis_code\\scRNAseq_Gastruloids\\new_codes\\data\\"
