@@ -228,14 +228,16 @@ meta_pijuan$celltype.general <- c
 c <- c()
 for(i in 1:length(meta_anlas$celltype.anlas)){
   old <- meta_anlas$celltype.anlas[i]
-  if(grepl("Early ", old)){
+  if(grepl("Early diff", old)){
     c[i] <- 'G Early diff'
+  } else if(grepl("Early vasc", old)){
+    c[i] <- 'G Mesodermal'
   } else if(grepl("Primed ", old)){
     c[i] <- 'G Primed pluripotent'
   } else if(grepl("Pluripotent ", old)){
     c[i] <- 'G Pluripotent'
   } else if(grepl("Mesodermal", old)){
-    c[i] <- 'G Mesoderm'
+    c[i] <- 'G Mesodermal'
   } else if(grepl("Neural ", old)){
     c[i] <- 'G Neural'
   } else if(grepl("neural&", old)){
