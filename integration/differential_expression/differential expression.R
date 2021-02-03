@@ -19,7 +19,7 @@ suppressPackageStartupMessages(library(irlba))
 suppressPackageStartupMessages(library(umap))
 
 data_location <- "server"
-# data_location <- "local"
+data_location <- "local"
 # data_location <- "ext_drive"
 
 if(data_location == "server"){
@@ -214,10 +214,12 @@ levels(seurat_pluripotent)
 # write.csv(markers.epi.primed,paste0(outFolder,"markers_epi_primed.csv"))
 ############################################
 
-### make diff exp analysis
+############################################
+########## make diff exp analysis
+############################################
 
 ### epiblast vs pluripotent
-# genes.to.label = c("Rps2", "Dppa5a", "Tdh")
+
 c_pluri <- seurat_pluripotent[,(seurat_pluripotent$celltype.general=='Epiblast')|
                                (seurat_pluripotent$celltype.general=='G Pluripotent')]
 Idents(c_pluri) <- "dataset"
@@ -240,12 +242,12 @@ p1 <- ggplot(avg.cells.pluri, aes(pijuan, anlas)) + geom_point() + ggtitle("Epib
 p1 <- LabelPoints(plot = p1, points = markers_epi_pluri$gene, repel = TRUE)
 p1
 
-write.csv(c_pluri[labels(markers_epi_pluri)[[1]],][['RNA']]@data,paste0(outFolder,"expression_markers_epi_pluri.csv"))
+write.csv(c_pluri[labels(markers_epi_pluri)[[1]],][['RNA']]@data,paste0(outFolder,"expression_markersDiff_epi_pluri.csv"))
 # write.csv(seurat_pluripotent$celltype.general,paste0(outFolder,"cell_id.csv"))
-write.csv(markers_epi_pluri,paste0(outFolder,"markers_epi_pluri.csv"))
+write.csv(markers_epi_pluri,paste0(outFolder,"markersDiff_epi_pluri.csv"))
 
 ### epiblast vs primed pluripotent
-# genes.to.label = c("Rps2", "Dppa5a", "Tdh")
+
 c_primed <- seurat_pluripotent[,(seurat_pluripotent$celltype.general=='Epiblast')|
                                 (seurat_pluripotent$celltype.general=='G Primed pluripotent')]
 Idents(c_primed) <- "dataset"
@@ -268,12 +270,12 @@ p2 <- ggplot(avg.cells.primed, aes(pijuan, anlas)) + geom_point() + ggtitle("Epi
 p2 <- LabelPoints(plot = p2, points = markers_epi_primed$gene, repel = TRUE)
 p2
 
-write.csv(c_primed[labels(markers_epi_primed)[[1]],][['RNA']]@data,paste0(outFolder,"expression_markers_epi_primed.csv"))
+write.csv(c_primed[labels(markers_epi_primed)[[1]],][['RNA']]@data,paste0(outFolder,"expression_markersDiff_epi_primed.csv"))
 # write.csv(seurat_pluripotent$celltype.general,paste0(outFolder,"cell_id.csv"))
-write.csv(markers_epi_primed,paste0(outFolder,"markers_epi_primed.csv"))
+write.csv(markers_epi_primed,paste0(outFolder,"markersDiff_epi_primed.csv"))
 
 ### epiblast vs early diff
-# genes.to.label = c("Rps2", "Dppa5a", "Tdh")
+
 c_ediff <- seurat_pluripotent[,(seurat_pluripotent$celltype.general=='Epiblast')|
                                  (seurat_pluripotent$celltype.general=='G Early diff')]
 Idents(c_ediff) <- "dataset"
@@ -296,7 +298,67 @@ p3 <- ggplot(avg.cells.ediff, aes(pijuan, anlas)) + geom_point() + ggtitle("Epib
 p3 <- LabelPoints(plot = p3, points = markers_epi_ediff$gene, repel = TRUE)
 p3
 
-write.csv(c_ediff[labels(markers_epi_primed)[[1]],][['RNA']]@data,paste0(outFolder,"expression_markers_epi_ediff.csv"))
+write.csv(c_ediff[labels(markers_epi_primed)[[1]],][['RNA']]@data,paste0(outFolder,"expression_markersDiff_epi_ediff.csv"))
 # write.csv(seurat_pluripotent$celltype.general,paste0(outFolder,"cell_id.csv"))
-write.csv(markers_epi_primed,paste0(outFolder,"markers_epi_ediff.csv"))
+write.csv(markers_epi_primed,paste0(outFolder,"markersDiff_epi_ediff.csv"))
+
+############################################
+########## save data for marker genes
+############################################
+
+seurat_all_early <- seurat_all[,((seurat_all$stage!='E7.75')&
+                        (seurat_all$stage!='E8.0')&
+                        (seurat_all$stage!='E8.25')&
+                        (seurat_all$stage!='E8.5'))|(seurat_all$dataset=='anlas')]
+
+genes_pluri <- c('Oct4','Nanog','Sox2','Esrrb','Wnt8a','Nkx1-2','Lefty1','Lefty2','Tdgf1','Evx1')
+
+genes_meso <- c('T','Eomes','Six2','Mesp1','Mesp2','Cer1','Msgn1','Hand1',
+           'Myl7','Myocd','Tnnt2','Msgn1','Snail1','Foxc2','Pdgfra','Osr1','Tbx6','Mesp1')
+
+genes_endo <- c('Sox17','Cer1','Gata6','Foxa2','Mixl1','Lhx1')
+
+genes_ecto <- c('Sox2','Oct6','Zeb2','Otx2','Zic2','Zic3','Olig2','Mab21l2','Nkx6-2','Neurog2','Pax6',
+                'Epha2','Zic1','Zic5','Hoxa2','Msx3','Utf1','Grik3','Slc7a3','Sox1','Sox3','Olig3','Neurod1')
+
+genes_mech <- c('cdh1','cdh2','Mmps')
+
+genes_all <- c('Zfp42','Nanog','Esrrb','Klf4','T','Eomes','Gsc','Lefty1','Mixl1','Mesp1','Mesp2','Lhx1','Hand1',
+               'Tbx6','Msgn1','Foxc2','Pdgfra','Osr1','Snai1','Myl7','Tnnt2','Cer1','Six2','Meox1','Sox1','Sox2','Sox3',
+               'Pou3f1','Zeb2','Otx2','Zic1','Zic2','Zic3','Zic5','Olig2','Neurog2','Nes','Gbx2','Pax2','Pax6','Ncam1','Utf1',
+               'Epha2','Hoxa2','Msx3','Grik3','Slc7a3','Sox17','Foxa2','Gata4')
+
+### pluripotency
+c_pluri <- seurat_all_early[,(seurat_all_early$celltype.general=='Epiblast')|
+                                (seurat_all_early$celltype.general=='Primitive Streak')|
+                                (seurat_all_early$celltype.general=='G Pluripotent')|
+                                (seurat_all_early$celltype.general=='G Early diff')|
+                                (seurat_all_early$celltype.general=='G Primed pluripotent')]
+write.csv(c_pluri[genes_pluri,][['RNA']]@data,paste0(outFolder,"expression_markersGenes_pluri.csv"))
+write.csv(c_pluri@meta.data,paste0(outFolder,"expression_markersGenes_pluri_meta.csv"))
+
+### mesoderm
+c_meso <- seurat_all_early[,(seurat_all_early$celltype.general=='Mesoderm')|
+                       (seurat_all_early$celltype.general=='Primitive Streak')|
+                       (seurat_all_early$celltype.general=='G Mesodermal')|
+                       (seurat_all_early$celltype.general=='G Mesendodermal')]
+write.csv(c_meso[genes_meso,][['RNA']]@data,paste0(outFolder,"expression_markersGenes_meso.csv"))
+write.csv(c_meso@meta.data,paste0(outFolder,"expression_markersGenes_meso_meta.csv"))
+
+### endoderm
+c_endo <- seurat_all_early[,(seurat_all_early$celltype.general=='Endoderm')|
+                       (seurat_all_early$celltype.general=='G Endodermal')]
+write.csv(c_endo[genes_endo,][['RNA']]@data,paste0(outFolder,"expression_markersGenes_endo.csv"))
+write.csv(c_endo@meta.data,paste0(outFolder,"expression_markersGenes_endo_meta.csv"))
+
+### ectoderm
+c_ecto <- seurat_all_early[,(seurat_all_early$celltype.general=='Ectoderm')|
+                       (seurat_all_early$celltype.general=='G Neural')]
+write.csv(c_ecto[genes_ecto,][['RNA']]@data,paste0(outFolder,"expression_markersGenes_ecto.csv"))
+write.csv(c_ecto@meta.data,paste0(outFolder,"expression_markersGenes_ecto_meta.csv"))
+
+#### all markers
+c_all <- seurat_all_early[genes_all,]
+write.csv(c_all[['RNA']]@data,paste0(outFolder,"expression_markersGenes_ALL.csv"))
+write.csv(c_all@meta.data,paste0(outFolder,"expression_markersGenes_ALL_meta.csv"))
 
